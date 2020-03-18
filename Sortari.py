@@ -91,7 +91,6 @@ def quicksort(l):
     _quicksort(l,0,len(l)-1)
 def testare(sortare,list,t1):
     t2=datetime.datetime.now()
-
     if list==sortare:
         print("Lista sortata in ")
         print(t2-t1)
@@ -107,28 +106,36 @@ def testare(sortare,list,t1):
             print("Lista nesortata")
 
 import datetime
-l=generator(1000000,1000000)
-list=list(l) #ii facem o copie lui l pentru a o sorta cu sortarea implicita
+lista=generator(10000000,1000000)
+l=list(lista) #ii facem o copie lui l pentru a o sorta cu sortarea implicita
 t1=datetime.datetime.now()
-list.sort()
+l.sort()
 t2=datetime.datetime.now()
 print("Functia sort: ")
 print(t2-t1)
-#print("Mergesort: ")
-#t1=datetime.datetime.now()
-#testare(mergeSort(l),list,t1)
-#print("Quicksort:")
-#t1=datetime.datetime.now()
-#testare(quicksort(l),list,t1)
+l=list(lista)
+print("Mergesort: ")
+t1=datetime.datetime.now()
+testare(mergeSort(l),list,t1)
+l=list(lista)
+print("Quicksort:")
+t1=datetime.datetime.now()
+testare(quicksort(l),list,t1)
+l=list(lista)
 print("Radixsort: ")
 t1=datetime.datetime.now()
 testare(radixsort(l),list,t1)
-#print("Countsort:")
-#t1=datetime.datetime.now()
-#testare(countsort(l),list,t1)
-#print("Bubblesort:")
-#t1=datetime.datetime.now()
-#testare(bubblesort(l),list,t2)
+l=list(lista)
+print("Countsort:")
+t1=datetime.datetime.now()
+testare(countsort(l),list,t1)
+l=list(lista)
+print("Bubblesort:")
+if len(l)<=10000:
+    t1=datetime.datetime.now()
+    testare(bubblesort(l),list,t2)
+else:
+    print("Prea multe numere pentru bubble")
 
 
 

@@ -1,0 +1,319 @@
+#include<bits/stdc++.h>
+using namespace std;
+ifstream f("abce.in");
+ofstream g("abce.out");
+class node
+{
+public:
+    int key;
+    node *left;
+    node *right;
+    int h;
+
+};
+int max(int a, int b)
+{
+    return (a>b)? a:b;
+}
+int height(node * N)
+{
+    if(N==NULL)
+        return 0;
+    return N->h;
+}
+node* firstnod(int key)
+{
+    node* nou=new node();
+    nou->key=key;
+    nou->right=NULL;
+    nou->left=NULL;
+    nou->h=1;
+    return(nou);
+
+}
+void afisare(node *radacina)
+{
+    if(radacina!=NULL)
+    {
+        g<<radacina->key<<" ";
+        afisare(radacina->left);
+        afisare(radacina->right);
+    }
+
+}
+node *rightRotate(node *a)
+{
+    node *b=a->left;
+    node *p=b->right;
+    b->right=a;
+    a->left=p;
+    a->h=max(height(a->left), height(a->right))+1;
+    b->h=max(height(b->left), height(b->right))+1;
+    return b;
+
+}
+
+node *leftRotate(node *a)
+{
+    node *b=a->right;
+    node *p=b->left;
+    b->left=a;
+    a->right=p;
+    a->h=max(height(a->left), height(a->right))+1;
+    b->h=max(height(b->left), height(b->right))+1;
+    return b;
+
+}
+int GetBalance(node *N)
+{
+    if(N==NULL)
+        return 0;
+    return height(N->left)-height(N->right);
+}
+
+node* inserare(node *N,int key)
+{
+    if(N==NULL)
+        return firstnod(key);
+    if(key<N->key)
+        N->left=inserare(N->left, key);
+    else if(key>N->key)
+        N->right=inserare(N->right, key);
+    else return N;
+
+
+    N->h=1+ max(height(N->right), height(N->left));
+
+    int balance=GetBalance(N);
+
+    if(balance>1 && key<N->left->key)
+        return rightRotate(N);
+
+    if (balance<-1 && key>N->right->key)
+
+        return leftRotate(N);
+
+
+    if (balance>1 && key>N->left->key)
+    {
+        N->left = leftRotate(N->left);
+        return rightRotate(N);
+
+    }
+
+    if (balance<-1 && key<N->right->key)
+    {
+        N->right=rightRotate(N->right);
+        return leftRotate(N);
+    }
+
+    return N;
+
+}
+node * ValMin(node* N)
+{
+    node* curent = N;
+
+    while (curent->left != NULL)
+        curent = curent->left;
+
+    return curent;
+}
+node* ValMax(node* N)
+{
+    node* curent = N;
+
+    while (curent->right != NULL)
+        curent = curent->right;
+
+    return curent;
+}
+node* deleteNod(node* radacina, int key)
+{
+    if (radacina == NULL)
+        return radacina;
+
+    if ( key < radacina->key )
+        radacina->left=deleteNod(radacina->left, key);
+    else if( key > radacina->key )
+        radacina->right=deleteNod(radacina->right, key);
+    else
+    {
+        if( (radacina->left == NULL) ||
+                (radacina->right == NULL) )
+        {
+            node *temp = radacina->left ?
+                         radacina->left :
+                         radacina->right;
+
+            if (temp == NULL)
+            {
+                temp = radacina;
+                radacina = NULL;
+            }
+            else
+                *radacina = *temp;
+            free(temp);
+
+        }
+        else
+        {
+            node* temp = ValMin(radacina->right);
+            radacina->key = temp->key;
+            radacina->right=deleteNod(radacina->right, temp->key);
+
+        }
+    }
+    if(radacina==NULL)
+        return radacina;
+    radacina->h = 1 + max(height(radacina->left), height(radacina->right));
+
+    int balance = GetBalance(radacina);
+
+    if (balance > 1 && GetBalance(radacina->left) >= 0)
+        return rightRotate(radacina);
+
+    if (balance > 1 && GetBalance(radacina->left) < 0)
+    {
+        radacina->left = leftRotate(radacina->left);
+        return rightRotate(radacina);
+    }
+
+    if (balance < -1 && GetBalance(radacina->right) <= 0)
+        return  leftRotate(radacina);
+
+    if (balance < -1 && GetBalance(radacina->right) > 0)
+    {
+        radacina->right = rightRotate(radacina->right);
+        return leftRotate(radacina);
+    }
+return radacina;
+}
+
+
+void cautare(node *radacina, int key)
+{
+    if(radacina==NULL)
+        g<<0;
+    else
+    {
+        if(key<radacina->key)
+            cautare(radacina->left, key);
+        else if(key>radacina->key)
+            cautare(radacina->right, key);
+        else
+
+            g<<1;
+    }
+
+
+
+}
+
+void  succesor(node* radacina, int key)
+{
+    if(radacina==NULL)
+        g<<-1;
+    else if(radacina->key<key)
+        succesor(radacina->right, key);
+    else if((radacina->left==NULL)|| ((ValMax(radacina->left))->key<key))
+        g<<radacina->key;
+
+    else
+        succesor(radacina->left,key);
+
+
+}
+
+void  predecesor(node* radacina, int key)
+{
+    if(radacina==NULL)
+        g<<-1;
+    else if(radacina->key>key)
+        predecesor(radacina->left, key);
+    else if((radacina->right==NULL)|| ((ValMin(radacina->right))->key>key))
+        g<<radacina->key;
+
+    else
+        predecesor(radacina->right,key);
+
+
+}
+
+void interval(node *radacina, int key1, int key2)
+{
+    if(radacina!=NULL)
+    {
+        if(key1>radacina->key)
+            interval(radacina->right, key1, key2);
+        else if(key2<radacina->key)
+            interval(radacina->left, key1,key2);
+        else
+        {
+
+            interval(radacina->left, key1, key2);
+            g<<radacina->key<<" ";/// afisam aici pentru ca parcurgerea sa fie stanga-radacina-dreapta, deci ca sa fie in ordine crescatoare
+            interval(radacina->right, key1, key2);
+
+        }
+    }
+}
+int main()
+{
+    int n;
+    f>>n;
+    int x,y,z;
+    node* radacina=NULL;
+
+    while(n--)
+    {
+        f>>x;
+        if(x==0)
+        {
+            afisare(radacina);
+        }
+        if(x==1)
+        {
+            f>>y;
+            radacina=inserare(radacina, y );
+        }
+        if(x==2)
+        {
+            f>>y;
+            radacina=deleteNod(radacina, y);
+        }
+        if(x==3)
+        {
+            f>>y;
+            cautare(radacina, y);
+            if(n>=1)
+                g<<"\n";
+        }
+        if(x==4)
+        {
+            f>>y;
+            predecesor(radacina, y);
+            if(n>=1)
+                g<<"\n";
+        }
+        if(x==5)
+        {
+            f>>y;
+            succesor(radacina, y);
+            if(n>=1)
+                g<<"\n";
+        }
+        if(x==6)
+        {
+            f>>y;
+            f>>z;
+            interval(radacina,y, z);
+            if(n>=1)
+                g<<"\n";
+
+        }
+    }
+    f.close();
+    g.close();
+    return 0;
+}
